@@ -1,0 +1,23 @@
+{
+  "name": "ap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SpaceofWeb/ap.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SpaceofWeb/ap/issues"
+  },
+  "homepage": "https://github.com/SpaceofWeb/ap#readme",
+  "dependencies": {
+    "mysql": "^2.15.0",
+    "string-similarity": "^1.2.0"
+  }
+}
