@@ -4,7 +4,8 @@
 * class for work with data base
 */
 class db {
-	function __construct($db){
+	function __construct($cfg, $db){
+		$this->cfg = $cfg;
 		$this->db = $db;
 	}
 
@@ -14,12 +15,14 @@ class db {
 				return $this->escapeVar($var);
 			} elseif (is_array($var)) {
 				return $this->escapeArr($var);
-			} elseif (is_int($var)) {
-				return $this->escapeInt($var);
 			}
 		}
 
 		return '';
+	}
+
+	public function getInt($var) {
+		return (int)$this->escapeVar($var, []);
 	}
 
 	public function escapeVar($var, $opts=['trim', 'strip_tags', 'html']) {
@@ -37,14 +40,10 @@ class db {
 		return $var;
 	}
 
-	public function escapeInt($var) {
-		return (int)$this->escapeVar($var, []);
-	}
-
-	public function buildSelectQuery($mig, $order) {
+	public function buildSelectQuery($mig, $order, $limit) {
 		$order = $this->buildOrder($order);
 
-		return "SELECT * FROM ap_{$mig} {$order}";
+		return "SELECT * FROM ap_{$mig} {$order} LIMIT {$limit}, {$cfg['rowsPerPage']}";
 	}
 
 	public function buildInsertQuery($mig, $formData) {
@@ -70,17 +69,17 @@ class db {
 		return '';
 	}
 
-	public function buildFormData($formData) {
+	public function buildFormData($fd) {
 		$rows = '(';
 		$vals = 'VALUES(';
 
-		for ($i=0; $i < count($formData); $i++) {
-			$rows .= $formData[$i]['name'].',';
+		for ($i=0; $i < count($fd); $i++) {
+			$rows .= $fd[$i]['name'].',';
 
-			if (is_int($formData[$i]['value']))
-				$vals .= ''.$formData[$i]['value'].',';
+			if (is_int($fd[$i]['value']))
+				$vals .= ''.$fd[$i]['value'].',';
 			else
-				$vals .= '\''.$formData[$i]['value'].'\',';
+				$vals .= '\''.$fd[$i]['value'].'\',';
 		}
 
 		$rows = substr($rows, 0, -1).')';
@@ -101,8 +100,8 @@ class db {
 		return $params;
 	}
 
-	public function select($mig, $order) {
-		$q = $this->buildSelectQuery($mig, $order);
+	public function select($mig, $order, $limit) {
+		$q = $this->buildSelectQuery($mig, $order, $limit);
 
 		$res = $this->db->query($q);
 
@@ -136,10 +135,14 @@ class db {
 		];
 	}
 
-	public function call($proc, $params) {
-		$params = $this->buildProcData($params);
+	public function call($proc, $params=NULL) {
+		if ($params !== NULL) {
+			$params = $this->buildProcData($params);
 
-		$res = $this->db->query("CALL {$proc}{$params}");
+			$res = $this->db->query("CALL {$proc}{$params}");
+		} else {
+			$res = $this->db->query("CALL {$proc}");
+		}
 
 		return [
 			'errNo'=> $this->db->errno,

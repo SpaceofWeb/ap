@@ -147,7 +147,7 @@ $(document).ready(() => {
 		e.preventDefault();
 
 		var q = {migration: 'students', formData: formAddStudent.serializeArray()};
-		app.ajax('set', 'json', q, (d) => {
+		app.ajax('setter', 'json', q, (d) => {
 			if (d.status == 'ok') {
 				$.notify('Success added!', 'success');
 				formAddStudent[0].reset();
@@ -174,7 +174,7 @@ $(document).ready(() => {
 		formDataSet.append('migration', 'diplomas');
 
 		// var q = {migration: 'diplomas'};
-		app.ajaxFile('set', 'json', formDataSet, (d) => {
+		app.ajaxFile('setter', 'json', formDataSet, (d) => {
 			if (d.status == 'ok') {
 				$.notify('Success added!', 'success');
 				formAddDiploma[0].reset();
@@ -192,7 +192,7 @@ $(document).ready(() => {
 	function getGroups() {
 		var q = {migration: 'groups', order: 'name'};
 
-		app.ajax('get', 'json', q, (d) => {
+		app.ajax('getter', 'json', q, (d) => {
 			if (d.status == 'err') {
 				$.notify('Error: Can`t get group list: '+d.data, 'error');
 				console.log(d);
@@ -214,7 +214,7 @@ $(document).ready(() => {
 	function getStudents() {
 		var q = {migration: 'students', order: ['group_id', 'firstName']};
 
-		app.ajax('get', 'json', q, (d) => {
+		app.ajax('getter', 'json', q, (d) => {
 			if (d.status == 'err') {
 				$.notify('Error: Can`t get student list: '+d.data, 'error');
 				console.log(d);

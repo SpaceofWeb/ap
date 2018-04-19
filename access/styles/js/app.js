@@ -4,7 +4,7 @@
 function AP() {
 	self = this;
 	self.lastQuery = 0;
-	self.timeout = 3;
+	self.timeout = 1;
 }
 
 
@@ -24,7 +24,7 @@ AP.prototype.getUnixtime = function() {
 }
 
 
-AP.prototype.ajax = function(type='get', datatype='json', d={}, cb, timeout=true) {
+AP.prototype.ajax = function(type='getter', datatype='json', d={}, cb, timeout=true) {
 	if (timeout) {
 		if (self.getUnixtime() - self.lastQuery < self.timeout) {
 			cb({status: 'err', data: 'Wait for timeout'});
@@ -34,7 +34,7 @@ AP.prototype.ajax = function(type='get', datatype='json', d={}, cb, timeout=true
 	}
 
 	$.ajax({
-		url: 'engine/ajax/'+type+'ter.php',
+		url: 'engine/ajax/'+type+'.php',
 		type: 'POST',
 		dataType: datatype,
 		data: d,
@@ -53,7 +53,7 @@ AP.prototype.ajax = function(type='get', datatype='json', d={}, cb, timeout=true
 }
 
 
-AP.prototype.ajaxFile = function(type='set', datatype='json', d={}, cb) {
+AP.prototype.ajaxFile = function(type='setter', datatype='json', d={}, cb) {
 	if (self.getUnixtime() - self.lastQuery < self.timeout) {
 		cb({status: 'err', data: 'Wait for timeout'});
 		return;
@@ -61,7 +61,7 @@ AP.prototype.ajaxFile = function(type='set', datatype='json', d={}, cb) {
 	self.lastQuery = self.getUnixtime();
 
 	$.ajax({
-		url: 'engine/ajax/'+type+'ter.php',
+		url: 'engine/ajax/'+type+'.php',
 		type: 'POST',
 		dataType: datatype,
 		processData: false,

@@ -15,15 +15,18 @@ require_once '../classes/db.php';
 
 // send('err', $_POST);
 
-function send($status, $data) {
-	die(json_encode(['status'=> $status, 'data'=> $data]));
+function send($status, $data=[], $info=[]) {
+	die(json_encode(['status'=> $status, 'data'=> $data, 'info'=> $info]));
 }
 
 
-$data = new db($db);
+$data = new db($cfg, $db);
 
 $migration = $data->getVar($_POST['migration']);
 $order = $data->getVar($_POST['order']);
+$limit = $data->getInt($_POST['limit']);
+
+$limit = ($limit == '') ? 0 : ($limit-1)*$cfg['rowsPerPage'];
 
 
 if ($migration == '') {
@@ -37,29 +40,51 @@ if ($migration == 'procedure') {
 	$s2 = $data->getVar($_POST['formData']['s2']);
 
 	if ($s1 != '' && $s2 == '') {
-		$res = $data->call('getDipByFirst', [$s1, 0, $cfg['rowsPerPage']]);
+
+		$res = $data->call('getDipByFirst', [$s1, $limit, $cfg['rowsPerPage']]);
+		$data->db->next_result();
+		$res['count'] = $data->call('getDipByFirstCount', [$s1])
+										['res']->fetch_assoc()['count'];
+
 	} elseif ($s1 == '' && $s2 != '') {
-		$res = $data->call('getDipBySecond', [$s2, 0, $cfg['rowsPerPage']]);
+
+		$res = $data->call('getDipBySecond', [$s2, $limit, $cfg['rowsPerPage']]);
+		$data->db->next_result();
+		$res['count'] = $data->call('getDipBySecondCount', [$s2])
+										['res']->fetch_assoc()['count'];
+
 	} elseif ($s1 != '' && $s2 != '') {
-		$res = $data->call('getDipByBoth', [$s1, $s2, 0, $cfg['rowsPerPage']]);
+
+		$res = $data->call('getDipByBoth', [$s1, $s2, $limit, $cfg['rowsPerPage']]);
+		$data->db->next_result();
+		$res['count'] = $data->call('getDipByBothCount', [$s1, $s2])
+										['res']->fetch_assoc()['count'];
+
 	} else {
-		send('err', 'both students are invalid '.$s1.$s2);
+
+		$res = $data->call('getDip', [$limit, $cfg['rowsPerPage']]);
+		$data->db->next_result();
+		$res['count'] = $data->call('getDipCount')
+										['res']->fetch_assoc()['count'];
 	}
 
 } else {
-	$res = $data->select($migration, $order);
+	$res = $data->select($migration, $order, $limit);
 }
+
 
 if ($res['errNo'] != 0) {
 	send('err', 'DB error: '.$res['errMsg']);
 }
 
 if ($res['res']->num_rows > 0) {
+	// $a = $res;
+	$a = [];
 	while ($row = $res['res']->fetch_assoc()) {
 		$a[] = $row;
 	}
 
-	send('ok', $a);
+	send('ok', $a, ['count'=> round($res['count']/$cfg['rowsPerPage'])]);
 } else {
 	send('err', 'rows not found');
 }
