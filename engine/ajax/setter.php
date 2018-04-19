@@ -116,6 +116,7 @@ if ($res['errNo'] != 0) {
 } elseif ($res['errNo'] == 0) {
 	if ($migration == 'diplomas') {
 		$data->call('addPercentRows', [$res['insertId']]);
+		exec('node ../compare/compare.js > /dev/null &');
 	}
 
 	send('ok');

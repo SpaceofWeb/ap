@@ -1,6 +1,7 @@
 <?php
 
 class DocumentParser {
+
     /**
      * Parse a document from the contents of the string
      * @param mixed $string The contents of the file to process
@@ -28,7 +29,7 @@ class DocumentParser {
      */
     static function parseFromFile($filename, $mimetype = null) {
         if (!is_readable($filename)) {
-            throw new \Exception("Failed to read file: cannot read file {$filename}");
+            throw new \Exception('Failed to read file: cannot read file %s', $filename);
         }
         if (!$mimetype) {
             $mimetype = mime_content_type($filename);
@@ -44,9 +45,10 @@ class DocumentParser {
         } else if ($mimetype === 'application/vnd.oasis.opendocument.text') {
             return self::parseZipped($filename, 'content.xml');
         } else {
-            throw new \Exception("Failed to read file: unknown mimetype {$mimetype}");
+            throw new \Exception('Failed to read file: unknown mimetype %s', $mimetype);
         }
     }
+
     /**
      * Parse zipped document, i.e. .docx or .odt (adapted from http://goo.gl/usI7PF)
      * @param string $filename The path to the document
@@ -57,14 +59,14 @@ class DocumentParser {
      */
     private static function parseZipped($filename, $datafile) {
         // Zip function requires a read from a file
-        $zip = new ZipArchive;
+        $zip = new \ZipArchive();
         $content = '';
         if ($zip->open($filename)) {
             // If done, search for the data file in the archive
             if (($index = $zip->locateName($datafile)) !== false) {
                 // If the data file can be found, read it to the string
                 $data = $zip->getFromIndex($index);
-                $xmldoc = new DOMDocument();
+                $xmldoc = new \DOMDocument();
                 $xmldoc->loadXML($data, LIBXML_NOENT | LIBXML_XINCLUDE | LIBXML_NOERROR | LIBXML_NOWARNING);
                 if ($datafile === 'word/document.xml') {
                     // Perform docx specific processing
@@ -83,12 +85,12 @@ class DocumentParser {
     
     /**
      * Convert a DOCX XMLDocument to html
-     * @param DOMDocument $xmldoc The xml document describing the word file
+     * @param \DOMDocument $xmldoc The xml document describing the word file
      */
-    private static function convertWordToHtml(DOMDocument $xmldoc) {
+    private static function convertWordToHtml(\DOMDocument $xmldoc) {
         // To make processing easier, remove the 'w' namespace from all elements
         self::removeDomNamespace($xmldoc, 'w');
-        $xpath = new DOMXPath($xmldoc);
+        $xpath = new \DOMXPath($xmldoc);
         // Get all 'r' elements
         foreach ($xpath->query("//r") as $node) {
             /*@var $node DOMElement*/
@@ -97,7 +99,7 @@ class DocumentParser {
             // The rPr tag defines style elements 
             $stylenodes = $node->getElementsByTagName('rPr');
             $textnode = $node->getElementsByTagName('t')->item(0);
-            if ($stylenodes && $stylenodes->length) {
+            if ($stylenodes && $textnode && $stylenodes->length) {
                 $stylenode = $stylenodes->item(0);
                 $itags = $stylenode->getElementsByTagName('i');
                 $btags = $stylenode->getElementsByTagName('b');
@@ -117,13 +119,13 @@ class DocumentParser {
     
     /**
      * Convert an ODT XMLDocument to html
-     * @param DOMDocument $xmldoc The XML document to manipulate
+     * @param \DOMDocument $xmldoc The XML document to manipulate
      */
-    private static function convertOdtToHtml(DOMDocument $xmldoc) {
+    private static function convertOdtToHtml(\DOMDocument $xmldoc) {
         self::removeDomNamespace($xmldoc, 'office');
         self::removeDomNamespace($xmldoc, 'style');
         self::removeDomNamespace($xmldoc, 'text');
-        $xpath = new DOMXPath($xmldoc);
+        $xpath = new \DOMXPath($xmldoc);
         // Cannot select using XPath attributes for some reason, cannot seem to access 'style-name' attr
         $spans = $xpath->query("//body/text/p/span");
         foreach ($spans as $span) {
@@ -147,11 +149,11 @@ class DocumentParser {
     
     /**
      * Remove empty tags from a document
-     * @param DOMDocument $xmldoc The document to look in
+     * @param \DOMDocument $xmldoc The document to look in
      * @param string $tagname The name of the tag to test for emptiness
      */
-    private static function removeEmptyTag(DOMDocument $xmldoc, $tagname) {
-        $xpath = new DOMXPath($xmldoc);
+    private static function removeEmptyTag(\DOMDocument $xmldoc, $tagname) {
+        $xpath = new \DOMXPath($xmldoc);
         foreach ($xpath->query("//$tagname") as $node) {
             /*@var $node DOMElement*/
             if (trim($node->textContent) === '') {
@@ -163,11 +165,11 @@ class DocumentParser {
     
     /**
      * Remove the namespace from an XML document (adapted from http://goo.gl/RBlUPU)
-     * @param DOMDocument $xmldoc The document to process
+     * @param \DOMDocument $xmldoc The document to process
      * @param string $namespace The namespace to remove
      */
-    private static function removeDomNamespace(DOMDocument $xmldoc, $namespace) {
-        $xpath = new DOMXPath($xmldoc);
+    private static function removeDomNamespace(\DOMDocument $xmldoc, $namespace) {
+        $xpath = new \DOMXPath($xmldoc);
         $nodes = $xpath->query("//*[namespace::{$namespace} and not(../namespace::{$namespace})]");
         foreach ($nodes as $n) {
             $namespaceuri = $n->lookupNamespaceURI($namespace);
@@ -177,11 +179,11 @@ class DocumentParser {
     
     /**
      * Rename a DOMElement (i.e. rename a tag, e.g. i -> em). (adapted from http://goo.gl/Crll0b)
-     * @param DOMElement $tag The tag to rename
+     * @param \DOMElement $tag The tag to rename
      * @param string $newtagname The name of the new tag
-     * @return DOMElement
+     * @return \DOMElement
      */
-    private static function renameTag(DOMElement $tag, $newtagname) {
+    private static function renameTag(\DOMElement $tag, $newtagname) {
         $document = $tag->ownerDocument;
         $newtag = $document->createElement($newtagname);
         $tag->parentNode->replaceChild($newtag, $tag);
@@ -193,14 +195,14 @@ class DocumentParser {
     
     /**
      * Remove nodes from a given document by their tag names
-     * @param DOMDocument $xml The XML document from which to remove nodes
+     * @param \DOMDocument $xml The XML document from which to remove nodes
      * @param string|array $tagnames A comma separated list of tagnames to remove
      */
-    private static function removeNodesByTagname(DOMDocument $xml, $tagnames) {
+    private static function removeNodesByTagname(\DOMDocument $xml, $tagnames) {
         if (!is_array($tagnames)) {
             $tagnames = explode(',', $tagnames);
         }
-        $xpath = new DOMXPath($xml);
+        $xpath = new \DOMXPath($xml);
         foreach ($tagnames as $tagname) {
             $nodes = $xpath->query("//{$tagname}");
             foreach ($nodes as $node) {
@@ -213,6 +215,7 @@ class DocumentParser {
             }
         }
     }
+
     /**
      * Parse a .doc file (adapted from http://goo.gl/Wm29Aj)
      * @param string $filename The path to the word document
@@ -247,11 +250,11 @@ class DocumentParser {
      * @return html Simplified HTML with just p, em and strong tags
      */
     private static function parseDocAntiword($contents) {
-        $xml = new DOMDocument;
+        $xml = new \DOMDocument;
         $xml->preserveWhiteSpace = false;
         $xml->loadXML($contents);
         self::removeNodesByTagname($xml, 'title,bookinfo');
-        $xpath = new DOMXPath($xml);
+        $xpath = new \DOMXPath($xml);
         // Find all of the 'para' nodes
         $paranodes = $xpath->query('//para');
         foreach ($paranodes as $node) {
@@ -272,6 +275,7 @@ class DocumentParser {
         // White space management. Required if output is being in JS Code editors like tinyMCE
         return str_replace("\n", '', trim(strip_tags($xml->saveXML(), '<p><em><b>')));
     }
+
     /**
      * Determine whether a line in a .rtf string is plain text (adapted from http://goo.gl/yVojUP)
      * @param string $string The string to parse
@@ -286,6 +290,7 @@ class DocumentParser {
         }
         return true;
     }
+
     /**
      * Parse a .rtf file (adapted from http://goo.gl/yVojUP).
      * @todo Parse properly. Returning a peculiar result.
@@ -312,6 +317,7 @@ class DocumentParser {
                 case "\\":
                     // read next character
                     $nc = $text[$i + 1];
+
                     // If it is another backslash or nonbreaking space or hyphen,
                     // then the character is plain text and add it to the output stream.
                     if ($nc == '\\' && $isplaintext) {
@@ -338,6 +344,7 @@ class DocumentParser {
                     } elseif ($nc >= 'a' && $nc <= 'z' || $nc >= 'A' && $nc <= 'Z') {
                         $word = "";
                         $param = null;
+
                         // Start reading characters after the backslash.
                         for ($k = $i + 1, $m = 0; $k < strlen($text); $k++, $m++) {
                             $nc = $text[$k];
@@ -368,6 +375,7 @@ class DocumentParser {
                         }
                         // Shift the pointer on the number of read characters.
                         $i += $m - 1;
+
                         // Start analyzing what we’ve read. We are interested mostly in control words.
                         $totext = "";
                         switch (strtolower($word)) {
@@ -458,4 +466,5 @@ class DocumentParser {
         // Return result.
         return $document;
     }
+
 }

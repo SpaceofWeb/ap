@@ -104,7 +104,7 @@ require_once 'access/static/header.php';
 	</div>
 </div>
 
-<script src="access/styles/js/jq-upload.js"></script>
+<!-- <script src="access/styles/js/jq-upload.js"></script> -->
 
 <script>
 
