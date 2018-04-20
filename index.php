@@ -18,15 +18,6 @@ require_once 'access/static/header.php';
 
 
 
-// Пагинация
-$limit = [];
-
-foreach (['t'=> 0] as $key => $val) {
-	$limit[$key] = (isset($_GET['p'][$key])) ? ($_GET['p'][$key]-1)*$cfg['rowsPerPage'] : 0;
-	$pag[$key] = (isset($_GET['p'][$key])) ? $_GET['p'][$key] : 1;
-}
-
-
 ?>
 
 
