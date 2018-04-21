@@ -2,9 +2,9 @@
 	ZipArchive
 
  ✔ compare @done (18-04-19 14:03)
- ☐ pagination
- ☐ backup
- ☐ diplomas.subject
- ☐ print doc
+ ✔ pagination @done (18-04-20 15:07)
+ ✔ diplomas.subject @done (18-04-21 12:02)
+ ☐ change page
  ☐ account
- ☐ page for each student
+ ☐ print doc
+ ☐ backup
