@@ -21,12 +21,13 @@ function send($status, $data='') {
 
 // send('err', [$_POST, $_FILES]);
 
-$data = new db($db);
+$data = new db($cfg, $db);
 
 $migration = $data->getVar($_POST['migration']);
 if ($migration == '') {
 	send('err', 'migration not valid');
 }
+
 
 
 // If we adding diplomas
@@ -88,7 +89,7 @@ if (isset($_FILES['file']) && $migration == 'diplomas') {
 		send('err', 'Ошибка парсинга файла');
 	}
 
-	$text = $data->escapeVar($text, ['trim', 'stripTags']);
+	$text = $data->escapeVar($text, []);
 
 	$formData[] = ['name'=> 'text', 'value'=> $text];
 	$formData[] = ['name'=> 'addDate', 'value'=> $addDate];

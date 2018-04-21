@@ -11,10 +11,10 @@ class db {
 
 	public function getVar($var) {
 		if (isset($var)) {
-			if (is_string($var)) {
-				return $this->escapeVar($var);
-			} elseif (is_array($var)) {
+			if (is_array($var)) {
 				return $this->escapeArr($var);
+			} else {
+				return $this->escapeVar($var);
 			}
 		}
 
@@ -43,7 +43,7 @@ class db {
 	public function buildSelectQuery($mig, $order, $limit) {
 		$order = $this->buildOrder($order);
 
-		return "SELECT * FROM ap_{$mig} {$order} LIMIT {$limit}, {$cfg['rowsPerPage']}";
+		return "SELECT * FROM ap_{$mig} {$order} LIMIT {$limit}, {$this->cfg['rowsPerPage']}";
 	}
 
 	public function buildInsertQuery($mig, $formData) {
@@ -109,6 +109,7 @@ class db {
 			'errNo'=> $this->db->errno,
 			'errMsg'=> $this->db->error,
 			'res'=> $res,
+			'q'=> $q,
 		];
 	}
 

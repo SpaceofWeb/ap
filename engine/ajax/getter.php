@@ -26,6 +26,7 @@ $migration = $data->getVar($_POST['migration']);
 $order = $data->getVar($_POST['order']);
 $limit = $data->getInt($_POST['limit']);
 
+$order = ($order) ? $order : '';
 $limit = ($limit == '') ? 0 : ($limit-1)*$cfg['rowsPerPage'];
 
 
@@ -38,27 +39,32 @@ if ($migration == 'procedure') {
 
 	$s1 = $data->getVar($_POST['formData']['s1']);
 	$s2 = $data->getVar($_POST['formData']['s2']);
+	$by = $data->getVar($_POST['formData']['by']);
 
-	if ($s1 != '' && $s2 == '') {
+	if ($by == 'str' && $s1 != '' && $s2 == '') {
 
 		$res = $data->call('getDipByFirst', [$s1, $limit, $cfg['rowsPerPage']]);
 		$data->db->next_result();
 		$res['count'] = $data->call('getDipByFirstCount', [$s1])
 										['res']->fetch_assoc()['count'];
 
-	} elseif ($s1 == '' && $s2 != '') {
+	} elseif ($by == 'str' && $s1 == '' && $s2 != '') {
 
 		$res = $data->call('getDipBySecond', [$s2, $limit, $cfg['rowsPerPage']]);
 		$data->db->next_result();
 		$res['count'] = $data->call('getDipBySecondCount', [$s2])
 										['res']->fetch_assoc()['count'];
 
-	} elseif ($s1 != '' && $s2 != '') {
+	} elseif ($by == 'str' && $s1 != '' && $s2 != '') {
 
 		$res = $data->call('getDipByBoth', [$s1, $s2, $limit, $cfg['rowsPerPage']]);
 		$data->db->next_result();
 		$res['count'] = $data->call('getDipByBothCount', [$s1, $s2])
 										['res']->fetch_assoc()['count'];
+
+	} elseif ($by == 'id' && $s1 != '' && $s2 != '') {
+
+		$res = $data->call('getDipById', [$s1, $s2]);
 
 	} else {
 
@@ -74,7 +80,7 @@ if ($migration == 'procedure') {
 
 
 if ($res['errNo'] != 0) {
-	send('err', 'DB error: '.$res['errMsg']);
+	send('err', 'DB error: '.$res['errMsg'], ['q'=> $res['q']]);
 }
 
 if ($res['res']->num_rows > 0) {
@@ -84,7 +90,14 @@ if ($res['res']->num_rows > 0) {
 		$a[] = $row;
 	}
 
-	send('ok', $a, ['count'=> round($res['count']/$cfg['rowsPerPage'])]);
+
+	$info = [];
+	$info['q'] = $res['q'];
+	if ($res['count'])
+		$info['count'] = round($res['count']/$cfg['rowsPerPage']);
+
+
+	send('ok', $a, $info);
 } else {
 	send('err', 'rows not found');
 }

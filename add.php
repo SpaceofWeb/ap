@@ -32,8 +32,13 @@ require_once 'access/static/header.php';
 					</div><br>
 
 					<div class="input-group">
+						<span class="input-group-addon bgcolor">Тема</span>
+						<input type="text" class="form-control" name="subject" required>
+					</div><br>
+
+					<div class="input-group">
 						<span class="input-group-addon bgcolor">Год сдачи</span>
-						<input type="text" class="form-control" name="year" id="year" value="<?=date("Y"); ?>" required>
+						<input type="text" class="form-control" name="year" value="<?=date("Y"); ?>" required>
 					</div><br>
 
 					<div class="input-group">
@@ -103,8 +108,6 @@ require_once 'access/static/header.php';
 		</div>
 	</div>
 </div>
-
-<!-- <script src="access/styles/js/jq-upload.js"></script> -->
 
 <script>
 
@@ -234,167 +237,7 @@ $(document).ready(() => {
 	}
 
 
-
-
-
-
-
-
-
-
 });
-
-
-
-
-
-// $(document).ready(() => {
-
-
-// var formAddDiploma = $('#formAddDiploma'),
-// 	formAddStudent = $('#formAddStudent'),
-// 	formAddGroup = $('#formAddGroup');
-
-
-
-// // Выбрать список студентов, групп
-// function getOptions(instance) {
-// 	$.ajax({
-// 		url: 'engine/ajax/getOptions.php',
-// 		type: 'POST',
-// 		data: {instance: instance},
-// 		success: (data) => {
-// 			try {
-// 				data = JSON.parse(data);
-// 			} catch(e) {}
-
-
-// 			if (data.err) {
-// 				$.notify(data.err, 'error');
-// 			} else {
-// 				if (instance == 'students') {
-// 					$('#student').html(data.data);
-// 				} else if (instance == 'groups') {
-// 					$('#groupSelect').html(data.data);
-// 				}
-// 			}
-// 		}
-// 	});
-// }
-
-
-
-// // Добавить группу в базу
-// formAddGroup.on('submit', (e) => {
-// 	e.preventDefault();
-
-// 	$.ajax({
-// 		url: 'engine/ajax/addGroup.php',
-// 		type: 'POST',
-// 		data: formAddGroup.serialize(),
-// 		success: (data) => {
-// 			try {
-// 				data = JSON.parse(data);
-// 			} catch(e) {}
-
-
-// 			if (data.err) {
-// 				$.notify(data.err, 'error');
-// 			} else {
-// 				$.notify(data.success, 'success');
-// 				formAddGroup[0].reset();
-// 				getOptions('groups');
-// 			}
-// 		}
-// 	});
-// });
-
-
-
-// // Добавить студента в базу
-// formAddStudent.on('submit', (e) => {
-// 	e.preventDefault();
-
-// 	$.ajax({
-// 		url: 'engine/ajax/addStudent.php',
-// 		type: 'POST',
-// 		data: formAddStudent.serialize(),
-// 		success: (data) => {
-// 			try {
-// 				data = JSON.parse(data);
-// 			} catch(e) {}
-
-
-// 			if (data.err) {
-// 				$.notify(data.err, 'error');
-// 			} else {
-// 				$.notify(data.success, 'success');
-// 				formAddStudent[0].reset();
-// 				getOptions('students');
-// 			}
-// 		}
-// 	});
-// });
-
-
-
-// // Загрузить дипломную и добавить в базу
-// formAddDiploma.jqUpload({
-// 	url: 'engine/ajax/addDiplomas.php',
-// 	// dataType: 'json',
-// 	dataType: 'text',
-// 	allowedTypes: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-// 	extFilter: 'docx',
-// 	getData: () => {
-// 		return {
-// 			student: $('#student').val(),
-// 			year: $('#year').val()
-// 		}
-// 	},
-// 	onBeforeUpload: function() {
-// 		$.notify('Загрузка начата', 'info');
-// 	},
-// 	onUploadProgress: function(percent) {
-// 		$('div.progress-bar').width(percent + '%');
-// 	},
-// 	onUploadSuccess: function(data) {
-// 		try {
-// 			data = JSON.parse(data);
-// 		} catch(e) {}
-
-// 		console.log("Server Response: \n", data);
-
-// 		if (data.err) {
-// 			$.notify(data.err, 'error');
-// 			$('div.progress-bar').width('0%');
-// 		} else {
-// 			$.notify('Дипломная работа успешно сохранена', 'success');
-
-// 			$('div.progress-bar').width('100%');
-// 			formAddDiploma[0].reset();
-
-// 			setTimeout(() => {
-// 				$('div.progress-bar').width('0%');
-// 			}, 2000);
-// 		}
-// 	},
-// 	onHaventFile: () => {
-// 		$.notify('Вы не выбрали файл', 'warn');
-// 	},
-// 	onUploadError: function(message) {
-// 		console.log(message);
-// 		$.notify('Ошибка загрузки файла: ' + message, 'error');
-// 	},
-// 	onFileTypeError: function(file) {
-// 		$.notify('Файл \'' + file.name + '\' должен быть с расширением ".docx"', 'error');
-// 	},
-// 	onFallbackMode: function(message) {
-// 		$.notify('Браузер не поддерживается: ' + message, 'error');
-// 	}
-// });
-
-
-// });
 
 </script>
 

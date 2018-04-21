@@ -91,6 +91,7 @@ AP.prototype.ajaxFile = function(type='setter', datatype='json', d={}, cb) {
 
 
 AP.prototype.ajaxFileProccess = function(e) {
+	console.log('asd');
 	var bar = self.getJQNode('.progress-bar'),
 			percent = 0,
 			position = e.loaded || e.position,

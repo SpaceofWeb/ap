@@ -25,30 +25,30 @@ require_once 'access/static/header.php';
 	<div class="row">
 		<div class="col-md-12">
 			<div class="jumbotron pb-md-2">
-				<h4>Search diplomas</h4><br>
+				<h4>Поиск дипломных</h4><br>
 					<form class="form-inline" id="formSearch">
 						<div class="input-group mb-2 mr-sm-2 mb-sm-0">
-							<div class="input-group-addon">Student1</div>
-							<input type="text" class="form-control" id="s1" placeholder="FML">
+							<div class="input-group-addon">Студент</div>
+							<input type="text" class="form-control" id="s1" placeholder="ФИО">
 							<input type="hidden" id="s1h">
 						</div>
 
 						<div class="input-group mb-2 mr-sm-2 mb-sm-0">
-							<div class="input-group-addon">Student2</div>
-							<input type="text" class="form-control" id="s2" placeholder="FML">
+							<div class="input-group-addon">Студент</div>
+							<input type="text" class="form-control" id="s2" placeholder="ФИО">
 							<input type="hidden" id="s2h">
 						</div>
 
 						<div class="input-group mb-2 mr-sm-2 mb-sm-0">
-							<input type="submit" class="form-control" value="search">
+							<input type="submit" class="form-control" value="поиск">
 						</div>
 					</form>
 
 				<table class="table table-stripped">
 					<thead>
 						<tr>
-							<th>Student</th>
-							<th>Student2</th>
+							<th>Студент</th>
+							<th>Студент</th>
 							<th class="right">%</th>
 						</tr>
 					</thead>
@@ -81,8 +81,6 @@ require_once 'access/static/header.php';
 	</div>
 </div>
 
-<link href="access/styles/css/jquery-ui.css" rel="stylesheet">
-<script src="access/styles/js/jquery-ui.js"></script>
 
 <script>
 
@@ -101,24 +99,7 @@ $(document).ready(() => {
 
 
 
-	// $('#s1').autocomplete({
-	// 	source: 'engine/ajax/getter.php',
-	// 	select: (event, ui) => {
-	// 		console.log(event, ui);
-	// 		$('#tS1h').val(ui.item.id);
-	// 		getStudents(ui.item.id, 'diplomas');
-	// 	}
-	// });
-
-	// $('#s2').autocomplete({
-	// 	source: 'engine/ajax/getOptions.php',
-	// 	select: (event, ui) => {
-	// 		$('#tS2h').val(ui.item.id);
-	// 		getStudents(ui.item.id, 'diplomas');
-	// 	}
-	// });
-
-
+	search();
 	formSearch.on('submit', (e) => {
 		e.preventDefault();
 
@@ -144,6 +125,7 @@ $(document).ready(() => {
 
 	function search(page=1) {
 		var q = {migration: 'procedure', formData: {
+			by: 'str',
 			s1: $('#s1').val(),
 			s2: $('#s2').val()
 		}, limit: page};
@@ -195,216 +177,7 @@ $(document).ready(() => {
 	}
 
 
-
-
-
-
 });
-
-
-
-// $(document).ready(() => {
-
-// var rowsPerPage = <?=$cfg['rowsPerPage']; ?>,
-// 	diplomas = $('#diplomas'),
-// 	topDiplomas = $('#topDiplomas');
-
-
-// // Автодополнение для поиска
-// // $('#search').autocomplete({
-// // 	source: 'engine/ajax/getOptions.php',
-// // 	select: (event, ui) => {
-// // 		$('#studentHidden').val(ui.item.id);
-// // 		getStudents(ui.item.id, 'diplomas');
-// // 	}
-// // });
-
-// $('#tS1').autocomplete({
-// 	source: 'engine/ajax/getOptions.php',
-// 	select: (event, ui) => {
-// 		$('#tS1h').val(ui.item.id);
-// 		getStudents(ui.item.id, 'diplomas');
-// 	}
-// });
-
-// $('#tS2').autocomplete({
-// 	source: 'engine/ajax/getOptions.php',
-// 	select: (event, ui) => {
-// 		$('#tS2h').val(ui.item.id);
-// 		getStudents(ui.item.id, 'diplomas');
-// 	}
-// });
-
-
-// // Пагинация дипломных по студенту
-// $('#diplomasPag a').on('click', (e) => {
-// 	e.preventDefault();
-
-// 	var p = getPage();
-// 	p.d = e.currentTarget.dataset.page;
-
-// 	search('', 'diplomas', p, (data, count) => {
-// 		var html = '';
-
-// 		for (var i in data) {
-// 			html += '<tr>\
-// 						<td>'+data[i].name+'</td>\
-// 						<td class="right">'+data[i].percent+'</td>\
-// 					</tr>';
-// 		}
-
-// 		diplomas.val('');
-// 		diplomas.html(html);
-
-// 		setPagination(p.d, count, 'diplomas');
-// 	});
-// });
-
-
-// // Пагинация дипломных
-// $('#topDiplomasPag a').on('click', (e) => {
-// 	e.preventDefault();
-
-// 	var p = getPage();
-// 	p.t = e.currentTarget.dataset.page;
-
-// 	search('', 'topDiplomas', p, (data, count) => {
-// 		var html = '';
-
-// 		for (var i in data) {
-// 			html += '<tr>\
-// 						<td>'+data[i].name+'</td>\
-// 						<td>'+data[i].name2+'</td>\
-// 						<td class="right">'+data[i].percent+'</td>\
-// 					</tr>';
-// 		}
-
-// 		topDiplomas.val('');
-// 		topDiplomas.html(html);
-
-// 		setPagination(p.t, count, 'topDiplomas');
-
-// 		history.pushState({}, '', '?'+toQueryString(p));
-// 	});
-// });
-
-
-
-
-
-// // Выбрать список студентов
-// function getStudents(id, instance) {
-// 	$.ajax({
-// 		url: 'engine/ajax/searchMain.php',
-// 		type: 'POST',
-// 		data: {student: $('#tS1h').val(), student2: $('#tS2h').val(), instance: instance},
-// 		success: (data) => {
-// 			try {
-// 				data = JSON.parse(data);
-// 			} catch(e) {}
-
-// 			// $('#tS1h').val('');
-// 			// $('#tS2h').val('');
-
-// 			var html = '';
-// 			for (var i in data.data) {
-// 				html += '<tr>\
-// 							<td>'+data.data[i].name1+'</td>\
-// 							<td>'+data.data[i].name2+'</td>\
-// 							<td class="right">'+data.data[i].percent+'</td>\
-// 						</tr>';
-// 			}
-
-// 			diplomas.val('');
-// 			diplomas.html(html);
-
-// 			setPagination(1, data.count, 'diplomas');
-// 		}
-// 	});
-// }
-
-
-// // Поиск
-// function search(s, instance, pagin, cb) {
-// 	$.ajax({
-// 		url: 'engine/ajax/searchMain.php',
-// 		type: 'POST',
-// 		cache: false,
-// 		data: {'student': $('#studentHidden').val(), 'instance': instance, 'pagin': pagin},
-// 		success: (data) => {
-// 			try {
-// 				data = JSON.parse(data);
-// 			} catch(e) {}
-
-// 			// if error
-// 			if (data.err) {
-// 				$.notify(data.err, 'error');
-// 				return;
-// 			}
-
-// 			cb(data.data, data.count);
-// 		}
-// 	});
-// }
-
-
-// // Создание и установка пагинации
-// function setPagination(current, count, instance) {
-// 	current = (parseInt(current)) ? parseInt(current) : 1;
-// 	count = parseInt(count);
-
-// 	var all = Math.ceil(count/rowsPerPage);
-// 	all = (all == 0) ? 1 : all;
-
-// 	if (current <= 1) {
-// 		$('#'+instance+'Pag').find('li.first').addClass('disabled');
-// 		$('#'+instance+'Pag').find('li.first>a').attr('data-page', 1);
-// 	} else {
-// 		$('#'+instance+'Pag').find('li.first').removeClass('disabled');
-// 		$('#'+instance+'Pag').find('li.first>a').attr('data-page', current-1);
-// 	}
-
-// 	$('#'+instance+'Pag').find('li>span').text(current+'/'+all);
-
-// 	if (current >= all) {
-// 		$('#'+instance+'Pag').find('li.last').addClass('disabled');
-// 		$('#'+instance+'Pag').find('li.last>a').attr('data-page', count);
-// 	} else {
-// 		$('#'+instance+'Pag').find('li.last').removeClass('disabled');
-// 		$('#'+instance+'Pag').find('li.last>a').attr('data-page', current+1);
-// 	}
-
-// }
-
-
-// // Выбрать индекс страницы для пагинации
-// function getPage() {
-// 	var s = window.location.search.substring(1).split('&');
-// 	var p = {};
-
-// 	for (i in s) {
-// 		if (/p\[(\w+)\]=(\d*)/.test(s[i])) {
-// 			var m = /p\[(\w+)\]=(\d*)/.exec(s[i]);
-// 			p[m[1]] = m[2];
-// 		}
-// 	}
-
-// 	return p;
-// }
-
-
-// // Массив в строку запроса
-// function toQueryString(a) {
-// 	var out = [];
-// 	for(key in a) {
-// 		out.push('p[' + key + ']=' + encodeURIComponent(a[key]));
-// 	}
-
-// 	return out.join('&');
-// }
-
-
-// });
 
 </script>
 
