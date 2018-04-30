@@ -237,7 +237,7 @@ if (isset($_POST['raw']) && $_POST['raw'] == true) {
 // Если запрос надо сгенерировать //
 ////////////////////////////////////
 if (!isset($_POST['migration']) || $_POST['migration'] == '') {
-	send('err', 'migration not valid');
+	send('err', 'таблица не валидна');
 }
 $migration = $_POST['migration'];
 

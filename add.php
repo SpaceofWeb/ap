@@ -147,7 +147,6 @@ $(document).ready(() => {
 		let q = {migration: 'students', formData: formAddStudent.serializeArray()};
 		app.ajax('add', 'json', q, (d) => {
 			if (d.status == 'ok') {
-				console.log(d);
 				$.notify('Успешно добавленно!', 'success');
 				formAddStudent[0].reset();
 				getStudents();

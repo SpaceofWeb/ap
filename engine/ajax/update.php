@@ -23,12 +23,12 @@ $db->setPrefix('ap_');
 // Получение данных //
 //////////////////////
 if (!isset($_POST['migration']) || $_POST['migration'] == '') {
-	send('err', 'migration not valid');
+	send('err', 'таблица не валидна');
 }
 $migration = $_POST['migration'];
 
 if (!isset($_POST['id']) || $_POST['id'] == '') {
-	send('err', 'id not valid');
+	send('err', 'id не валиден');
 }
 $id = $_POST['id'];
 
@@ -47,7 +47,7 @@ foreach ($_POST as $key => $value) {
 if (isset($_FILES['file']) && $migration == 'diplomas') {
 
 	if ($_FILES['file']['error']) {
-		send('err', 'File upload error: '.$_FILES['file']['error']);
+		send('err', 'Ошибка загрузки файла: '.$_FILES['file']['error']);
 	}
 
 	// Check if diploma exists in db
@@ -109,7 +109,7 @@ $db->where('id', $id);
 
 try {
 	if ($db->update($migration, $data))
-		send('ok', 'success updated');
+		send('ok', 'Успешно обновленно!');
 	else
 		send('err', 'DB error: '.$db->getLastError());
 

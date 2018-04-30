@@ -144,7 +144,6 @@ $(document).ready(() => {
 				return;
 			}
 
-			console.log(d);
 			setPagin(page, d.info.count);
 
 			var html = '<option value="0">-</option>';

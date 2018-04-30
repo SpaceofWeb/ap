@@ -23,7 +23,7 @@ $db->setPrefix('ap_');
 // Получение данных //
 //////////////////////
 if (!isset($_POST['migration']) || $_POST['migration'] == '') {
-	send('err', 'migration not valid');
+	send('err', 'таблица не валидна');
 }
 $migration = $_POST['migration'];
 
@@ -42,7 +42,7 @@ foreach ($_POST as $key => $value) {
 if (isset($_FILES['file']) && $migration == 'diplomas') {
 
 	if ($_FILES['file']['error']) {
-		send('err', 'File upload error: '.$_FILES['file']['error']);
+		send('err', 'Ошибка загрузки файла: '.$_FILES['file']['error']);
 	}
 
 	// Проверяем есть ли дипломная у данного студента
@@ -54,7 +54,7 @@ if (isset($_FILES['file']) && $migration == 'diplomas') {
 	}
 
 	if ($db->count != 0) {
-		send('err', 'diploma already exists');
+		send('err', 'у данного студента уже есть дипломная работа');
 	}
 
 	// Сохранение дипломной
