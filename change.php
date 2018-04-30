@@ -16,8 +16,6 @@ require_once 'engine/inc/db.php';
 require_once 'access/static/head.php';
 require_once 'access/static/header.php';
 
-
-
 ?>
 
 
@@ -435,7 +433,7 @@ $(document).ready(() => {
 
 		update(q, (d) => {
 			if (d.status == 'ok') {
-				$.notify('Success updated!', 'success');
+				$.notify(d.data, 'success');
 				getGroupList();
 			} else if (d.status == 'err') {
 				$.notify('Error: '+d.data, 'error');
@@ -457,7 +455,7 @@ $(document).ready(() => {
 
 		update(q, (d) => {
 			if (d.status == 'ok') {
-				$.notify('Success updated!', 'success');
+				$.notify(d.data, 'success');
 				getStudentList();
 			} else if (d.status == 'err') {
 				$.notify('Error: '+d.data, 'error');
@@ -482,7 +480,7 @@ $(document).ready(() => {
 
 		updateFile(formDataSet, (d) => {
 			if (d.status == 'ok') {
-				$.notify('Success updated!', 'success');
+				$.notify(d.data, 'success');
 				getDiplomaList();
 				diplomasFormFile.value = '';
 			} else if (d.status == 'err') {
@@ -669,7 +667,7 @@ $(document).ready(() => {
 	function get(q={}, cb) {
 		app.ajax('get', 'json', q, (d) => {
 			if (d.status == 'err') {
-				$.notify('Error: Can`t get '+q.migration+' list: '+d.data, 'error');
+				$.notify('Error: '+d.data, 'error');
 				console.log(d);
 				return;
 			}
@@ -682,7 +680,7 @@ $(document).ready(() => {
 	function update(q={}, cb) {
 		app.ajax('update', 'json', q, (d) => {
 			if (d.status == 'err') {
-				$.notify('Error: Can`t update '+q.migration+': '+d.data, 'error');
+				$.notify('Error: '+d.data, 'error');
 				console.log(d);
 				return;
 			}
@@ -695,7 +693,7 @@ $(document).ready(() => {
 	function updateFile(q={}, cb) {
 		app.ajaxFile('update', 'json', q, (d) => {
 			if (d.status == 'err') {
-				$.notify('Error: Can`t update '+q.migration+': '+d.data, 'error');
+				$.notify('Error: '+d.data, 'error');
 				console.log(d);
 				return;
 			}

@@ -49,7 +49,7 @@ if (isset($_FILES['file']) && $migration == 'diplomas') {
 	$db->where('student_id', $data['student_id']);
 	$res = $db->get('diplomas', null, ['id']);
 
-	if ($db->getLastError() !== 0) {
+	if ($db->getLastErrno() !== 0) {
 		send('err', 'DB error: '.$db->getLastError());
 	}
 
@@ -93,7 +93,8 @@ if (isset($_FILES['file']) && $migration == 'diplomas') {
 	}
 
 
-	$data['text'] = $text;
+	$data['text'] = $db->escape(strip_tags(trim($text)));
+	$data['file'] = $file;
 	$data['addDate'] = $addDate;
 }
 // ==============================================================
@@ -103,12 +104,34 @@ if (isset($_FILES['file']) && $migration == 'diplomas') {
 try {
 	$id = $db->insert($migration, $data);
 } catch(Exception $e) {
-	send('err', 'Exception: '.$e->getMessage());
+	send('err', 'DB Exception: '.$e->getMessage());
 }
 
-if ($id)
-	send('ok', 'id: '.$id);
-else
+if ($id) {
+	if ($migration == 'diplomas') {
+		$q = "INSERT INTO ap_percentage (d1_id, d2_id)
+					SELECT ?, D2.id 
+					FROM ap_diplomas D2 
+					LEFT JOIN ap_diplomas D ON D.id=? 
+					LEFT JOIN ap_students S ON S.id=D.student_id 
+					LEFT JOIN ap_students S2 ON S2.id=D2.student_id 
+					WHERE D2.id < ? AND S.group_id=S2.group_id";
+
+		try {
+			$db->rawQuery($q, [$id, $id, $id]);
+			if (!$db->getLastErrno()) {
+				exec('node ../compare/compare.js > /dev/null &');
+				send('ok', 'Запись успешно добавлена!');
+			} else {
+				send('err', 'DB error: '.$db->getLastError());
+			}
+		} catch(Exception $e) {
+			send('err', 'DB Exception: '.$e->getMessage());
+		}
+	}
+
+	send('ok', 'Запись успешно добавлена!');
+} else
 	send('err', 'DB error: '.$db->getLastError());
 
 

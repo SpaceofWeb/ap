@@ -99,6 +99,7 @@ if (isset($_FILES['file']) && $migration == 'diplomas') {
 
 
 	$data['text'] = $db->escape(strip_tags(trim($text)));
+	$data['file'] = $file;
 	$data['addDate'] = $addDate;
 }
 // ==============================================================
@@ -108,13 +109,31 @@ if (isset($_FILES['file']) && $migration == 'diplomas') {
 $db->where('id', $id);
 
 try {
-	if ($db->update($migration, $data))
-		send('ok', 'Успешно обновленно!');
-	else
+	if ($db->update($migration, $data)) {
+		if ($migration == 'diplomas') {
+			$q = "UPDATE ap_percentage 
+						SET percent=NULL 
+						WHERE d1_id=? OR d2_id=?";
+
+			try {
+				$db->rawQuery($q, [$id, $id]);
+				if (!$db->getLastErrno()) {
+					exec('node ../compare/compare.js > /dev/null &');
+					send('ok', 'Запись успешно изменена!');
+				} else {
+					send('err', 'DB error: '.$db->getLastError());
+				}
+			} catch(Exception $e) {
+				send('err', 'DB Exception: '.$e->getMessage());
+			}
+		}
+
+		send('ok', 'Запись успешно изменена!');
+	} else
 		send('err', 'DB error: '.$db->getLastError());
 
 } catch(Exception $e) {
-	send('err', 'Exception: '.$e->getMessage());
+	send('err', 'DB Exception: '.$e->getMessage());
 }
 
 

@@ -126,10 +126,16 @@ $(document).ready(() => {
 	formAddGroup.on('submit', (e) => {
 		e.preventDefault();
 
-		let q = {migration: 'groups', formData: formAddGroup.serializeArray()};
+		let q = {migration: 'groups'},
+				fd = formAddGroup.serializeArray();
+
+		for (let i of fd) {
+			q[i.name] = i.value;
+		}
+
 		app.ajax('add', 'json', q, (d) => {
 			if (d.status == 'ok') {
-				$.notify('Успешно добавленно!', 'success');
+				$.notify(d.data, 'success');
 				formAddGroup[0].reset();
 				getGroups();
 			} else if (d.status == 'err') {
@@ -144,10 +150,16 @@ $(document).ready(() => {
 	formAddStudent.on('submit', (e) => {
 		e.preventDefault();
 
-		let q = {migration: 'students', formData: formAddStudent.serializeArray()};
+		let q = {migration: 'students'},
+				fd = formAddStudent.serializeArray();
+
+		for (let i of fd) {
+			q[i.name] = i.value;
+		}
+
 		app.ajax('add', 'json', q, (d) => {
 			if (d.status == 'ok') {
-				$.notify('Успешно добавленно!', 'success');
+				$.notify(d.data, 'success');
 				formAddStudent[0].reset();
 				getStudents();
 			} else if (d.status == 'err') {
@@ -171,10 +183,9 @@ $(document).ready(() => {
 		formDataSet.append('file', formAddDiplomaFile.files[0]);
 		formDataSet.append('migration', 'diplomas');
 
-		// var q = {migration: 'diplomas'};
-		app.ajaxFile('setter', 'json', formDataSet, (d) => {
+		app.ajaxFile('add', 'json', formDataSet, (d) => {
 			if (d.status == 'ok') {
-				$.notify('Успешно добавленно!', 'success');
+				$.notify(d.data, 'success');
 				formAddDiploma[0].reset();
 				getGroups();
 			} else if (d.status == 'err') {
