@@ -7,7 +7,6 @@
 require_once '../inc/conf.php';
 // require_once '../inc/db.php';
 require_once '../classes/mysqliDB.php';
-require_once '../classes/docx2text.php';
 
 
 function send($status, $data=[], $info=[]) {
