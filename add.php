@@ -7,9 +7,9 @@ require_once 'engine/inc/conf.php';
 require_once 'engine/inc/db.php';
 
 
-$protocol = ($_SERVER['REQUEST_SCHEME'] == 'http') ? 'http://' : 'https://';
-$url = $protocol . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-$url = parse_url($url);
+// $protocol = ($_SERVER['REQUEST_SCHEME'] == 'http') ? 'http://' : 'https://';
+// $url = $protocol . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+// $url = parse_url($url);
 
 
 
@@ -33,22 +33,17 @@ require_once 'access/static/header.php';
 
 					<div class="input-group">
 						<span class="input-group-addon bgcolor">Тема</span>
-						<input type="text" class="form-control" name="subject" required>
+						<input type="text" class="form-control" name="subject" placeholder="Тема" required>
 					</div><br>
 
 					<div class="input-group">
 						<span class="input-group-addon bgcolor">Год сдачи</span>
-						<input type="text" class="form-control" name="year" value="<?=date("Y"); ?>" required>
+						<input type="text" class="form-control" name="year" placeholder="Год" value="<?=date("Y"); ?>" required>
 					</div><br>
 
 					<div class="input-group">
 						<input type="file" name="files" id="file" class="custom-file-input1">
 						<!-- <span class="custom-file-control"></span> -->
-					</div><br>
-
-					<div id="progress" class="progress">
-						<div class="progress-bar progress-bar-striped" role="progressbar" style="width:0%"
-								aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 					</div><br>
 
 					<div class="right">
@@ -65,17 +60,17 @@ require_once 'access/static/header.php';
 				<form method="POST" id="formAddStudent">
 					<div class="input-group">
 						<span class="input-group-addon bgcolor">Фамилия</span>
-						<input type="text" class="form-control" name="firstName" required>
+						<input type="text" class="form-control" name="firstName" placeholder="Фамилия" required>
 					</div><br>
 
 					<div class="input-group">
 						<span class="input-group-addon bgcolor">Имя</span>
-						<input type="text" class="form-control" name="middleName" required>
+						<input type="text" class="form-control" name="middleName" placeholder="Имя" required>
 					</div><br>
 
 					<div class="input-group">
 						<span class="input-group-addon bgcolor">Отчество</span>
-						<input type="text" class="form-control" name="lastName" required>
+						<input type="text" class="form-control" name="lastName" placeholder="Отчество" required>
 					</div><br>
 
 					<div class="input-group">
@@ -96,8 +91,8 @@ require_once 'access/static/header.php';
 
 				<form method="POST" id="formAddGroup" name="form">
 					<div class="input-group">
-						<span class="input-group-addon bgcolor">Имя группы</span>
-						<input type="text" class="form-control" id="group" name="name" required>
+						<span class="input-group-addon bgcolor">Группа</span>
+						<input type="text" class="form-control" id="group" name="name" placeholder="Название группы" required>
 					</div><br>
 
 					<div class="right">
@@ -131,10 +126,10 @@ $(document).ready(() => {
 	formAddGroup.on('submit', (e) => {
 		e.preventDefault();
 
-		var q = {migration: 'groups', formData: formAddGroup.serializeArray()};
-		app.ajax('set', 'json', q, (d) => {
+		let q = {migration: 'groups', formData: formAddGroup.serializeArray()};
+		app.ajax('add', 'json', q, (d) => {
 			if (d.status == 'ok') {
-				$.notify('Success added!', 'success');
+				$.notify('Успешно добавленно!', 'success');
 				formAddGroup[0].reset();
 				getGroups();
 			} else if (d.status == 'err') {
@@ -149,12 +144,13 @@ $(document).ready(() => {
 	formAddStudent.on('submit', (e) => {
 		e.preventDefault();
 
-		var q = {migration: 'students', formData: formAddStudent.serializeArray()};
-		app.ajax('setter', 'json', q, (d) => {
+		let q = {migration: 'students', formData: formAddStudent.serializeArray()};
+		app.ajax('add', 'json', q, (d) => {
 			if (d.status == 'ok') {
-				$.notify('Success added!', 'success');
+				console.log(d);
+				$.notify('Успешно добавленно!', 'success');
 				formAddStudent[0].reset();
-				getGroups();
+				getStudents();
 			} else if (d.status == 'err') {
 				$.notify('Error: '+d.data, 'error');
 				console.log(d);
@@ -167,10 +163,10 @@ $(document).ready(() => {
 	formAddDiploma.on('submit', (e) => {
 		e.preventDefault();
 
-		var formDataSet = new FormData(),
+		let formDataSet = new FormData(),
 				formDataArr = formAddDiploma.serializeArray();
 
-		for (var i = 0; i < formDataArr.length; i++) {
+		for (let i = 0; i < formDataArr.length; i++) {
 			formDataSet.append(formDataArr[i].name, formDataArr[i].value);
 		}
 		formDataSet.append('file', formAddDiplomaFile.files[0]);
@@ -179,7 +175,7 @@ $(document).ready(() => {
 		// var q = {migration: 'diplomas'};
 		app.ajaxFile('setter', 'json', formDataSet, (d) => {
 			if (d.status == 'ok') {
-				$.notify('Success added!', 'success');
+				$.notify('Успешно добавленно!', 'success');
 				formAddDiploma[0].reset();
 				getGroups();
 			} else if (d.status == 'err') {
@@ -193,21 +189,28 @@ $(document).ready(() => {
 
 	// Выбрать список групп и записать их в селектор
 	function getGroups() {
-		var q = {migration: 'groups', order: 'name'};
+		let q = {
+			migration: 'groups',
+			cols: ['id', 'name'],
+			order: [
+				{
+					col: 'name',
+					sort: 'asc'
+				}
+			]
+		};
 
-		app.ajax('getter', 'json', q, (d) => {
+		app.ajax('get', 'json', q, (d) => {
 			if (d.status == 'err') {
-				$.notify('Error: Can`t get group list: '+d.data, 'error');
+				$.notify('Error: Невозможно получить список групп: '+d.data, 'error');
 				console.log(d);
 				return;
 			}
 
-			var html = '<option value="0">-</option>';
-
-			for (var i = 0; i < d.data.length; i++) {
+			let html = '<option value="0">-</option>';
+			for (let i = 0; i < d.data.length; i++) {
 				html += '<option value="'+d.data[i].id+'">'+d.data[i].name+'</option>'
 			}
-
 			groupSelect.innerHTML = html;
 		}, false);
 	}
@@ -215,23 +218,31 @@ $(document).ready(() => {
 
 	// Выбрать список студентов и записать их в селектор
 	function getStudents() {
-		var q = {migration: 'students', order: ['group_id', 'firstName']};
+		let q = {
+			migration: 'students',
+			cols: ['id', 'CONCAT(firstName, \' \', middleName, \' \', lastName) AS name'],
+			order: [
+				{
+					col: 'group_id',
+					sort: 'asc'
+				},{
+					col: 'firstName',
+					sort: 'asc'
+				}
+			]
+		};
 
-		app.ajax('getter', 'json', q, (d) => {
+		app.ajax('get', 'json', q, (d) => {
 			if (d.status == 'err') {
-				$.notify('Error: Can`t get student list: '+d.data, 'error');
+				$.notify('Error: Невозможно получить список студентов: '+d.data, 'error');
 				console.log(d);
 				return;
 			}
 
-			var html = '<option value="0">-</option>';
-
-			for (var i = 0; i < d.data.length; i++) {
-				html += '<option value="'+d.data[i].id+'">'
-							+d.data[i].firstName+' '+d.data[i].middleName+' '+d.data[i].lastName
-							+' '+'</option>'
+			let html = '<option value="0">-</option>';
+			for (let i = 0; i < d.data.length; i++) {
+				html += '<option value="'+d.data[i].id+'">'+d.data[i].name+' '+'</option>'
 			}
-
 			studentSelect.innerHTML = html;
 		}, false);
 	}

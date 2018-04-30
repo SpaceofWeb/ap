@@ -7,9 +7,9 @@ require_once 'engine/inc/conf.php';
 require_once 'engine/inc/db.php';
 
 
-$protocol = ($_SERVER['REQUEST_SCHEME'] == 'http') ? 'http://' : 'https://';
-$url = $protocol . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-$url = parse_url($url);
+// $protocol = ($_SERVER['REQUEST_SCHEME'] == 'http') ? 'http://' : 'https://';
+// $url = $protocol . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+// $url = parse_url($url);
 
 
 
@@ -87,6 +87,7 @@ require_once 'access/static/header.php';
 
 $(document).ready(() => {
 
+	// Инициализация переменных
 	var app = new AP;
 
 	var formSearch = app.getJQNode('#formSearch'),
@@ -98,14 +99,16 @@ $(document).ready(() => {
 			aLast = app.getJQNode('#aLast');
 
 
-
+	// Выборка при загрузке страницы
 	search();
+	// Поиск
 	formSearch.on('submit', (e) => {
 		e.preventDefault();
 
 		search();
 	});
 
+	// Пагинация назад
 	aFirst.on('click', (e) => {
 		e.preventDefault();
 
@@ -114,6 +117,7 @@ $(document).ready(() => {
 		search(p);
 	});
 
+	// Пагинация вперед
 	aLast.on('click', (e) => {
 		e.preventDefault();
 
@@ -123,27 +127,30 @@ $(document).ready(() => {
 	});
 
 
+	// Функция запроса на сервер
 	function search(page=1) {
-		var q = {migration: 'procedure', formData: {
+		let q= {
+			raw: true,
 			by: 'str',
 			s1: $('#s1').val(),
-			s2: $('#s2').val()
-		}, limit: page};
+			s2: $('#s2').val(),
+			limit: page
+		};
 
-		app.ajax('getter', 'json', q, (d) => {
+		app.ajax('get', 'json', q, (d) => {
 			if (d.status == 'err') {
 				$.notify('Error: Can`t get diploma list: '+d.data, 'error');
 				console.log(d);
 				return;
 			}
 
-			// console.log(d);
+			console.log(d);
 			setPagin(page, d.info.count);
 
 			var html = '<option value="0">-</option>';
 			var rows = '';
 
-			for (var i = 0; i < d.data.length; i++) {
+			for (let i = 0; i < d.data.length; i++) {
 				rows += '<tr>\
 									<td>'+d.data[i].s1+'</td>\
 									<td>'+d.data[i].s2+'</td>\
@@ -156,6 +163,7 @@ $(document).ready(() => {
 	}
 
 
+	// Генерация пагинации
 	function setPagin(page, count) {
 		if (page <= 1) {
 			liFirst.addClass('disabled');

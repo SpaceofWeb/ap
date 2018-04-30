@@ -1,8 +1,9 @@
+// Депенденси
 jsdiff = require('string-similarity');
 mysql = require('mysql');
 fs = require('fs');
 
-
+// Коннект к базе
 let conn = mysql.createConnection({
 	host: 'localhost',
 	user: 'root',
@@ -25,7 +26,7 @@ log('info', 'Start session');
 
 
 
-
+// Запрос в базу
 let q = 'SELECT P.id, D.text AS d, D2.text AS d2\
 	FROM ap_percentage P\
 	LEFT JOIN ap_diplomas D ON P.d1_id=D.id\
@@ -34,7 +35,7 @@ let q = 'SELECT P.id, D.text AS d, D2.text AS d2\
 	ORDER BY P.id LIMIT 1';
 
 
-
+// Подключение к базе
 conn.connect((err) => {
 	if (err) {
 		log('err', 'Can`t connect to db: '+err);
@@ -47,7 +48,7 @@ conn.connect((err) => {
 
 
 
-
+// Логирование
 function log(t='info', msg, cb) {
 	let d = new Date();
 
@@ -75,7 +76,8 @@ function log(t='info', msg, cb) {
 }
 
 
-
+// Выборка записи
+// Сравнение
 function getQuery() {
 	conn.query(q, function (err, res) {
 		if (err) {
@@ -104,6 +106,7 @@ function getQuery() {
 }
 
 
+// Запись результата в базу
 function setQuery(id, p) {
 	let setq = "UPDATE ap_percentage SET percent='"+p+"' WHERE id='"+id+"' ";
 	conn.query(setq, function (err, res) {
