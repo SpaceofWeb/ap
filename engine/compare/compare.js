@@ -11,6 +11,9 @@ let conn = mysql.createConnection({
 	database: 'ap'
 });
 
+// Префикс таблиц
+let pfx = 'ap_';
+
 
 
 // Инициализация логов
@@ -28,9 +31,9 @@ log('info', 'Start session');
 
 // Запрос в базу
 let q = 'SELECT P.id, D.text AS d, D2.text AS d2\
-	FROM ap_percentage P\
-	LEFT JOIN ap_diplomas D ON P.d1_id=D.id\
-	LEFT JOIN ap_diplomas D2 ON P.d2_id=D2.id\
+	FROM '+pfx+'percentage P\
+	LEFT JOIN '+pfx+'diplomas D ON P.d1_id=D.id\
+	LEFT JOIN '+pfx+'diplomas D2 ON P.d2_id=D2.id\
 	WHERE P.percent IS NULL\
 	ORDER BY P.id LIMIT 1';
 
@@ -108,7 +111,7 @@ function getQuery() {
 
 // Запись результата в базу
 function setQuery(id, p) {
-	let setq = "UPDATE ap_percentage SET percent='"+p+"' WHERE id='"+id+"' ";
+	let setq = "UPDATE "+pfx+"percentage SET percent='"+p+"' WHERE id='"+id+"' ";
 	conn.query(setq, function (err, res) {
 		if (err) {
 			log('err', 'Can`t set percent for id='+id+' : '+err)

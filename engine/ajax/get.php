@@ -15,7 +15,7 @@ function send($status, $data=[], $info=[]) {
 
 
 $db = new MysqliDb($cfg['dbhost'], $cfg['dbuser'], $cfg['dbpass'], $cfg['dbname']);
-$db->setPrefix('ap_');
+$db->setPrefix($cfg['dbprefix']);
 
 
 /////////////////////////////////////
@@ -34,27 +34,29 @@ if (isset($_POST['raw']) && $_POST['raw'] == true) {
 	$s1 = $_POST['s1'];
 	$s2 = $_POST['s2'];
 
+	$pfx = $cfg['dbprefix'];
+
 	// Выбираем по первому студенту
 	if ($by == 'str' && $s1 != '' && $s2 == '') {
 
 		$q = "SELECT P.percent,
 						CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) AS s1,
 						CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) AS s2
-					FROM ap_percentage P
-						LEFT JOIN ap_diplomas D ON D.id=P.d1_id
-						LEFT JOIN ap_students S ON S.id=D.student_id
-						LEFT JOIN ap_diplomas D2 ON D2.id=P.d2_id
-						LEFT JOIN ap_students S2 ON S2.id=D2.student_id
+					FROM {$pfx}percentage P
+						LEFT JOIN {$pfx}diplomas D ON D.id=P.d1_id
+						LEFT JOIN {$pfx}students S ON S.id=D.student_id
+						LEFT JOIN {$pfx}diplomas D2 ON D2.id=P.d2_id
+						LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id
 					WHERE CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) LIKE CONCAT('%?%')
 						AND P.percent IS NOT NULL
 					UNION SELECT P.percent,
 						CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) AS s1,
 						CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) AS s2
-					FROM ap_percentage P
-						LEFT JOIN ap_diplomas D ON D.id=P.d1_id
-						LEFT JOIN ap_students S ON S.id=D.student_id
-						LEFT JOIN ap_diplomas D2 ON D2.id=P.d2_id
-						LEFT JOIN ap_students S2 ON S2.id=D2.student_id
+					FROM {$pfx}percentage P
+						LEFT JOIN {$pfx}diplomas D ON D.id=P.d1_id
+						LEFT JOIN {$pfx}students S ON S.id=D.student_id
+						LEFT JOIN {$pfx}diplomas D2 ON D2.id=P.d2_id
+						LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id
 					WHERE CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) LIKE CONCAT('%?%')
 						AND P.percent IS NOT NULL
 					ORDER BY percent DESC
@@ -63,11 +65,11 @@ if (isset($_POST['raw']) && $_POST['raw'] == true) {
 		$params = [$s1, $s1, ($limit-1)*$cfg['rowsPerPage'], $cfg['rowsPerPage']];
 
 		$qCount = "SELECT COUNT(P.id) AS count
-							FROM ap_percentage P
-								LEFT JOIN ap_diplomas D ON D.id=P.d1_id
-								LEFT JOIN ap_students S ON S.id=D.student_id
-								LEFT JOIN ap_diplomas D2 ON D2.id=P.d2_id
-								LEFT JOIN ap_students S2 ON S2.id=D2.student_id
+							FROM {$pfx}percentage P
+								LEFT JOIN {$pfx}diplomas D ON D.id=P.d1_id
+								LEFT JOIN {$pfx}students S ON S.id=D.student_id
+								LEFT JOIN {$pfx}diplomas D2 ON D2.id=P.d2_id
+								LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id
 							WHERE (CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) LIKE CONCAT('%?%')
 								OR CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) LIKE CONCAT('%?%'))
 								AND P.percent IS NOT NULL
@@ -81,21 +83,21 @@ if (isset($_POST['raw']) && $_POST['raw'] == true) {
 		$q = "SELECT P.percent,
 						CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) AS s2,
 						CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) AS s1
-					FROM ap_percentage P
-						LEFT JOIN ap_diplomas D ON D.id=P.d1_id
-						LEFT JOIN ap_students S ON S.id=D.student_id
-						LEFT JOIN ap_diplomas D2 ON D2.id=P.d2_id
-						LEFT JOIN ap_students S2 ON S2.id=D2.student_id
+					FROM {$pfx}percentage P
+						LEFT JOIN {$pfx}diplomas D ON D.id=P.d1_id
+						LEFT JOIN {$pfx}students S ON S.id=D.student_id
+						LEFT JOIN {$pfx}diplomas D2 ON D2.id=P.d2_id
+						LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id
 					WHERE CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) LIKE CONCAT('%?%')
 						AND P.percent IS NOT NULL
 					UNION SELECT P.percent,
 						CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) AS s2,
 						CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) AS s1
-					FROM ap_percentage P
-						LEFT JOIN ap_diplomas D ON D.id=P.d1_id
-						LEFT JOIN ap_students S ON S.id=D.student_id
-						LEFT JOIN ap_diplomas D2 ON D2.id=P.d2_id
-						LEFT JOIN ap_students S2 ON S2.id=D2.student_id
+					FROM {$pfx}percentage P
+						LEFT JOIN {$pfx}diplomas D ON D.id=P.d1_id
+						LEFT JOIN {$pfx}students S ON S.id=D.student_id
+						LEFT JOIN {$pfx}diplomas D2 ON D2.id=P.d2_id
+						LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id
 					WHERE CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) LIKE CONCAT('%?%')
 						AND P.percent IS NOT NULL
 					ORDER BY percent DESC
@@ -104,11 +106,11 @@ if (isset($_POST['raw']) && $_POST['raw'] == true) {
 		$params = [$s2, $s2, ($limit-1)*$cfg['rowsPerPage'], $cfg['rowsPerPage']];
 
 		$qCount = "SELECT COUNT(P.id) AS count
-							FROM ap_percentage P
-								LEFT JOIN ap_diplomas D ON D.id=P.d1_id
-								LEFT JOIN ap_students S ON S.id=D.student_id
-								LEFT JOIN ap_diplomas D2 ON D2.id=P.d2_id
-								LEFT JOIN ap_students S2 ON S2.id=D2.student_id
+							FROM {$pfx}percentage P
+								LEFT JOIN {$pfx}diplomas D ON D.id=P.d1_id
+								LEFT JOIN {$pfx}students S ON S.id=D.student_id
+								LEFT JOIN {$pfx}diplomas D2 ON D2.id=P.d2_id
+								LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id
 							WHERE (CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) LIKE CONCAT('%?%')
 								OR CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) LIKE CONCAT('%?%'))
 								AND P.percent IS NOT NULL
@@ -122,22 +124,22 @@ if (isset($_POST['raw']) && $_POST['raw'] == true) {
 		$q = "SELECT P.percent,
 						CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) AS s1,
 						CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) AS s2
-					FROM ap_percentage P
-						LEFT JOIN ap_diplomas D ON D.id=P.d1_id
-						LEFT JOIN ap_students S ON S.id=D.student_id
-						LEFT JOIN ap_diplomas D2 ON D2.id=P.d2_id
-						LEFT JOIN ap_students S2 ON S2.id=D2.student_id
+					FROM {$pfx}percentage P
+						LEFT JOIN {$pfx}diplomas D ON D.id=P.d1_id
+						LEFT JOIN {$pfx}students S ON S.id=D.student_id
+						LEFT JOIN {$pfx}diplomas D2 ON D2.id=P.d2_id
+						LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id
 					WHERE (CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) LIKE CONCAT('%?%')
 						AND CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) LIKE CONCAT('%?%'))
 						AND P.percent IS NOT NULL
 					UNION SELECT P.percent,
 						CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) AS s1,
 						CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) AS s2
-					FROM ap_percentage P
-						LEFT JOIN ap_diplomas D ON D.id=P.d1_id
-						LEFT JOIN ap_students S ON S.id=D.student_id
-						LEFT JOIN ap_diplomas D2 ON D2.id=P.d2_id
-						LEFT JOIN ap_students S2 ON S2.id=D2.student_id
+					FROM {$pfx}percentage P
+						LEFT JOIN {$pfx}diplomas D ON D.id=P.d1_id
+						LEFT JOIN {$pfx}students S ON S.id=D.student_id
+						LEFT JOIN {$pfx}diplomas D2 ON D2.id=P.d2_id
+						LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id
 					WHERE (CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) LIKE CONCAT('%?%')
 						AND CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) LIKE CONCAT('%?%'))
 						AND P.percent IS NOT NULL
@@ -147,11 +149,11 @@ if (isset($_POST['raw']) && $_POST['raw'] == true) {
 		$params = [$s1, $s2, $s2, $s1, ($limit-1)*$cfg['rowsPerPage'], $cfg['rowsPerPage']];
 
 		$qCount = "SELECT COUNT(P.id) AS count
-							FROM ap_percentage P
-								LEFT JOIN ap_diplomas D ON D.id=P.d1_id
-								LEFT JOIN ap_students S ON S.id=D.student_id
-								LEFT JOIN ap_diplomas D2 ON D2.id=P.d2_id
-								LEFT JOIN ap_students S2 ON S2.id=D2.student_id
+							FROM {$pfx}percentage P
+								LEFT JOIN {$pfx}diplomas D ON D.id=P.d1_id
+								LEFT JOIN {$pfx}students S ON S.id=D.student_id
+								LEFT JOIN {$pfx}diplomas D2 ON D2.id=P.d2_id
+								LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id
 							WHERE ((CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) LIKE CONCAT('%?%')
 									AND CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) LIKE CONCAT('%?%'))
 							    OR (CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) LIKE CONCAT('%?%')
@@ -168,11 +170,11 @@ if (isset($_POST['raw']) && $_POST['raw'] == true) {
 						CONCAT(S.firstName, ' ', S.middleName, ' ', S.lastName) AS s1,
 						CONCAT(S2.firstName, ' ', S2.middleName, ' ', S2.lastName) AS s2,
 						D.text AS d1, D2.text AS d2
-					FROM ap_percentage P
-						LEFT JOIN ap_diplomas D ON D.id=P.d1_id
-						LEFT JOIN ap_students S ON S.id=D.student_id
-						LEFT JOIN ap_diplomas D2 ON D2.id=P.d2_id
-						LEFT JOIN ap_students S2 ON S2.id=D2.student_id
+					FROM {$pfx}percentage P
+						LEFT JOIN {$pfx}diplomas D ON D.id=P.d1_id
+						LEFT JOIN {$pfx}students S ON S.id=D.student_id
+						LEFT JOIN {$pfx}diplomas D2 ON D2.id=P.d2_id
+						LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id
 					WHERE ((P.d1_id=?
 							AND P.d2_id=?)
 						OR (P.d1_id=?
@@ -188,11 +190,11 @@ if (isset($_POST['raw']) && $_POST['raw'] == true) {
 		$q = "SELECT P.percent,
 						CONCAT(S.firstName,' ',S.middleName,' ',S.lastName) AS s1,
 						CONCAT(S2.firstName,' ',S2.middleName,' ',S2.lastName) AS s2
-					FROM ap_percentage P
-						LEFT JOIN ap_diplomas D ON D.id=P.d1_id
-						LEFT JOIN ap_students S ON S.id=D.student_id
-						LEFT JOIN ap_diplomas D2 ON D2.id=P.d2_id
-						LEFT JOIN ap_students S2 ON S2.id=D2.student_id
+					FROM {$pfx}percentage P
+						LEFT JOIN {$pfx}diplomas D ON D.id=P.d1_id
+						LEFT JOIN {$pfx}students S ON S.id=D.student_id
+						LEFT JOIN {$pfx}diplomas D2 ON D2.id=P.d2_id
+						LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id
 					WHERE P.percent IS NOT NULL
 					ORDER BY percent DESC
 					LIMIT ?, ?";
@@ -200,7 +202,7 @@ if (isset($_POST['raw']) && $_POST['raw'] == true) {
 		$params = [($limit-1)*$cfg['rowsPerPage'], $cfg['rowsPerPage']];
 
 		$qCount = "SELECT COUNT(id) AS rowsCount
-							FROM ap_percentage P
+							FROM {$pfx}percentage P
 							WHERE percent IS NOT NULL
 							LIMIT 1";
 

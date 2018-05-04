@@ -16,7 +16,7 @@ function send($status, $data='') {
 
 
 $db = new MysqliDb($cfg['dbhost'], $cfg['dbuser'], $cfg['dbpass'], $cfg['dbname']);
-$db->setPrefix('ap_');
+$db->setPrefix($cfg['dbprefix']);
 
 
 //////////////////////
@@ -38,6 +38,8 @@ foreach ($_POST as $key => $value) {
 	if ($key == 'migration' || $key == 'id' || $key == 'file') continue;
 	$data[$key] = $value;
 }
+
+$pfx = $cfg['dbprefix'];
 // ==============================================================
 
 
@@ -111,7 +113,7 @@ $db->where('id', $id);
 try {
 	if ($db->update($migration, $data)) {
 		if ($migration == 'diplomas') {
-			$q = "UPDATE ap_percentage 
+			$q = "UPDATE {$pfx}percentage 
 						SET percent=NULL 
 						WHERE d1_id=? OR d2_id=?";
 

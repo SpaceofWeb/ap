@@ -16,7 +16,7 @@ function send($status, $data='') {
 
 
 $db = new MysqliDb($cfg['dbhost'], $cfg['dbuser'], $cfg['dbpass'], $cfg['dbname']);
-$db->setPrefix('ap_');
+$db->setPrefix($cfg['dbprefix']);
 
 
 //////////////////////
@@ -33,6 +33,8 @@ foreach ($_POST as $key => $value) {
 	if ($key == 'migration' || $key == 'id' || $key == 'file') continue;
 	$data[$key] = $value;
 }
+
+$pfx = $cfg['dbprefix'];
 // ==============================================================
 
 
@@ -109,12 +111,12 @@ try {
 
 if ($id) {
 	if ($migration == 'diplomas') {
-		$q = "INSERT INTO ap_percentage (d1_id, d2_id)
+		$q = "INSERT INTO {$pfx}percentage (d1_id, d2_id)
 					SELECT ?, D2.id 
-					FROM ap_diplomas D2 
-					LEFT JOIN ap_diplomas D ON D.id=? 
-					LEFT JOIN ap_students S ON S.id=D.student_id 
-					LEFT JOIN ap_students S2 ON S2.id=D2.student_id 
+					FROM {$pfx}diplomas D2 
+					LEFT JOIN {$pfx}diplomas D ON D.id=? 
+					LEFT JOIN {$pfx}students S ON S.id=D.student_id 
+					LEFT JOIN {$pfx}students S2 ON S2.id=D2.student_id 
 					WHERE D2.id < ? AND S.group_id=S2.group_id";
 
 		try {

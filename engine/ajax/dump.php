@@ -1,5 +1,7 @@
 <?php
 
+// ini_set('display_errors', 1);
+
 // Создание дампа базы
 
 require_once '../inc/conf.php';
@@ -11,6 +13,23 @@ function send($status, $data='') {
 }
 
 
+$db = new MysqliDb($cfg['dbhost'], $cfg['dbuser'], $cfg['dbpass'], $cfg['dbname']);
+$db->setPrefix($cfg['dbprefix']);
+
+
+
+// Удаление старых работ
+$q = "DELETE FROM ap_diplomas WHERE year > (YEAR(NOW()) - ?)";
+
+try {
+	$rows = $db->rawQuery($q, [$cfg['oldDiplomas']]);
+} catch(Exception $e) {
+	send('err', 'Exception: '.$e->getMessage());
+}
+
+
+
+// Создание дампа
 $dir = $cfg['rootDir'] . '/dumps/';
 $file = $dir.'mysql_backup_'.date("Y-m-d", mktime()).'.sql.gz';
 
