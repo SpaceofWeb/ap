@@ -14,9 +14,6 @@
 			<li class="nav-item <?=($url['path'] == '/change.php') ? 'active' : ''; ?>">
 				<a class="nav-link" href="change.php">Изменить</a>
 			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="view.php">Просмотр</a>
-			</li>
 		</ul>
 	</div>
 </nav>

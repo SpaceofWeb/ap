@@ -1,7 +1,5 @@
 node_modules/
 uploads/
 
-diplomas/
-
 package-lock.json
 *.log
