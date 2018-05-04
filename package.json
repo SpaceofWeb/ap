@@ -2,15 +2,16 @@
   "name": "ap",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "engine/compare/compare.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compare": "node engine/compare/compare.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SpaceofWeb/ap.git"
   },
-  "author": "",
+  "author": "Space",
+  "email": "webproxa@gmail.com",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/SpaceofWeb/ap/issues"
