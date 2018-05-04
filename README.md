@@ -41,3 +41,6 @@ engine - движок
 Настройка php производится в файле `engine/inc/conf.php`   
 Настройка node.js производится в файле `engine/compare/compare.js`   
 
+
+## Сравнение
+Скрипт node.js сравнивает дипломные работы алгоритмом [Сёренсена-Дайса](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient)
